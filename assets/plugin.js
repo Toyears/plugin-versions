@@ -1,13 +1,13 @@
 require(['gitbook', 'jQuery'], function (gitbook, $) {
     var versions = [],
-        current = window.location.href,
+        host = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port,
+        current_version = window.location.pathname.replace(/\//g, ''),
         pluginConfig = {};
 
     // Update the select with a list of versions
     function updateVersions(_versions) {
         versions = _versions || versions;
-        current = $('.versions-select select').val() || current;
-
+        current_version = $('.versions-select select').val() || current_version;
         // Cleanup existing selector
         $('.versions-select').remove();
 
@@ -20,14 +20,10 @@ require(['gitbook', 'jQuery'], function (gitbook, $) {
         var $select = $li.find('select');
 
         $.each(versions, function(i, version) {
-            var $option = $('<option>', {
-                'selected': current === version.value,
-                'value': version.value,
-                'text': version.text
-            });
-
+            var $option = $('<option>', version);
             $option.appendTo($select);
         });
+        $select.find("option[value='"+current_version+"']").attr("selected", true)
 
         $select.change(function() {
             var filtered = $.grep(versions, function(v) {
@@ -36,7 +32,7 @@ require(['gitbook', 'jQuery'], function (gitbook, $) {
             // Get actual version Object from array
             var version = filtered[0];
             
-            window.location.replace(version.value)
+            window.location.replace(host + '/' + version.value + '/')
         });
 
         $li.prependTo('.book-summary ul.summary');
